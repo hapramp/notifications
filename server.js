@@ -113,10 +113,21 @@ const getNotifications = (ops) => {
   ops.forEach((op) => {
     const type = op.op[0];
     const params = op.op[1];
+    // filter hapramp posts
+    if (params.json_metadata) {
+      data = JSON.parse(params.json_metadata);
+      if (data && data['app'] && !(data['app'].startsWith('hapramp'))){
+        console.log('skipped');
+        return;
+      }
+    }
+    // filter only required type posts
+    if (!(['comment', 'vote', 'custom_json']).includes(type)) {
+      return;
+    }
     switch (type) {
       case 'comment': {
         const isRootPost = !params.parent_author;
-
         /** Find replies */
         if (!isRootPost) {
           const notification = {
@@ -205,18 +216,19 @@ const getNotifications = (ops) => {
       }
       case 'vote': {
         /** Find downvote */
-        if (params.weight < 0) {
-          const notification = {
-            type: 'vote',
-            voter: params.voter,
-            permlink: params.permlink,
-            weight: params.weight,
-            timestamp: Date.parse(op.timestamp) / 1000,
-            block: op.block,
-          };
-          // console.log('Downvote', JSON.stringify([params.author, notification]));
-          notifications.push([params.author, notification]);
-        }
+        // if (params.weight < 0) {
+        // console.log(params);
+        const notification = {
+          type: 'vote',
+          voter: params.voter,
+          permlink: params.permlink,
+          weight: params.weight,
+          timestamp: Date.parse(op.timestamp) / 1000,
+          block: op.block,
+        };
+        // console.log('Downvote', JSON.stringify([params.author, notification]));
+        notifications.push([params.author, notification]);
+        // }
         break;
       }
       case 'transfer': {
