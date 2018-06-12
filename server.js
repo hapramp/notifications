@@ -6,7 +6,7 @@ const sdk = require('sc2-sdk');
 const redis = require('./helpers/redis');
 const utils = require('./helpers/utils');
 
-const sc2 = sdk.Initialize({ app: 'busy.app' });
+const sc2 = sdk.Initialize({ app: 'hapramp.app' });
 
 const port = process.env.PORT || 4000;
 const server = express().listen(port, () => console.log(`Listening on ${port}`));
@@ -290,7 +290,7 @@ const loadBlock = (blockNum) => {
 
 const loadNextBlock = () => {
   redis.getAsync('last_block_num').then((res) => {
-    let nextBlockNum = (res === null) ? 23249775 : parseInt(res) + 1;  // block created on Jun 12 2018
+    let nextBlockNum = (res === null) ? 23251581 : parseInt(res) + 1;  // block created on Jun 12 2018
     utils.getGlobalProps().then(globalProps => {
       const lastIrreversibleBlockNum = globalProps.last_irreversible_block_num;
       if (lastIrreversibleBlockNum >= nextBlockNum) {
